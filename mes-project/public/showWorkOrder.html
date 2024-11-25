@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Show Work Order</title>
+</head>
+<body>
+  <h1>Work Order Details</h1>
+
+  <div id="workOrderDetails">
+    <p><strong>Loading...</strong></p>
+  </div>
+
+  <script>
+    // Get the orderId from the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('orderId');
+
+    if (!orderId) {
+      document.getElementById('workOrderDetails').innerHTML = '<p>Order ID is required in the URL.</p>';
+    } else {
+      // Fetch the work order details from the API
+      fetch(`http://127.0.0.1:5000/api/workorders/${orderId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message) {
+            document.getElementById('workOrderDetails').innerHTML = `<p>${data.message}</p>`;
+          } else {
+            // Display the work order details
+            document.getElementById('workOrderDetails').innerHTML = `
+              <p><strong>Order ID:</strong> ${data.orderId}</p>
+              <p><strong>Product:</strong> ${data.product}</p>
+              <p><strong>Quantity:</strong> ${data.quantity}</p>
+              <p><strong>Status:</strong> ${data.status}</p>
+              <p><strong>Start Date:</strong> ${new Date(data.startDate).toLocaleDateString()}</p>
+              <p><strong>End Date:</strong> ${data.endDate ? new Date(data.endDate).toLocaleDateString() : 'N/A'}</p>
+            `;
+          }
+        })
+        .catch((err) => {
+          console.error('Error fetching work order:', err);
+          document.getElementById('workOrderDetails').innerHTML = '<p>Error fetching work order details.</p>';
+        });
+    }
+  </script>
+</body>
+</html>
